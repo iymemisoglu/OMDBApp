@@ -9,7 +9,6 @@ import SwiftUI
 struct MovieFavoritesView: View {
     @EnvironmentObject var favoritesManager: FavoriteMoviesManager
     @State private var selectedMovie: Movie?
-    @State private var showingMovieDetail = false
     @State private var showingClearConfirmation = false
     
     var body: some View {
@@ -22,7 +21,6 @@ struct MovieFavoritesView: View {
                         movies: favoritesManager.favoriteMovies,
                         onMovieSelected: { movie in
                             selectedMovie = movie
-                            showingMovieDetail = true
                         }
                     )
                 }
@@ -38,11 +36,9 @@ struct MovieFavoritesView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showingMovieDetail) {
-                if let movie = selectedMovie {
-                    MovieDetailView(movie: movie)
-                        .environmentObject(favoritesManager)
-                }
+            .sheet(item: $selectedMovie) { movie in
+                MovieDetailView(movie: movie)
+                    .environmentObject(favoritesManager)
             }
             .alert("Clear All Favorites", isPresented: $showingClearConfirmation) {
                 Button("Cancel", role: .cancel) { }

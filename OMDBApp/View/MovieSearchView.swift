@@ -16,7 +16,6 @@ struct MovieSearchView: View {
     @State private var searchText = ""
     @State private var searchResults: [MovieSearchResult] = []
     @State private var selectedMovie: Movie?
-    @State private var showingMovieDetail = false
     
     var body: some View {
         NavigationView {
@@ -63,11 +62,9 @@ struct MovieSearchView: View {
                 }
             }
             .navigationTitle("Movie Search")
-            .sheet(isPresented: $showingMovieDetail) {
-                if let movie = selectedMovie {
-                    MovieDetailView(movie: movie)
-                        .environmentObject(favoritesManager)
-                }
+            .sheet(item: $selectedMovie) { movie in
+                MovieDetailView(movie: movie)
+                    .environmentObject(favoritesManager)
             }
         }
     }
@@ -90,7 +87,6 @@ struct MovieSearchView: View {
                 let movie = try await omdbService.fetchMovie(imdbID: result.imdbID)
                 await MainActor.run {
                     selectedMovie = movie
-                    showingMovieDetail = true
                 }
             } catch {
                 print("Error loading movie detail: \(error)")
